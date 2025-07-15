@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: criu-test
+  namespace: criu
+  labels:
+    app: criu-test
+spec:
+  template:
+    metadata:
+      labels:
+        app: criu-test
+    spec:
+      nodeSelector:
+        layer: edge
+      serviceAccountName: criu-test
+      restartPolicy: Never
+      containers:
+        - name: criu-test-cont
+          image: nefks/test:latest
+          imagePullPolicy: Always
+  ttlSecondsAfterFinished: 120
+  backoffLimit: 3

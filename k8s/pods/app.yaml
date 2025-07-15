@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: image-reduction
+  namespace: criu
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    layer: edge
+    node-group: eks-edge
+  containers:
+  - name: image-reduction-app
+    image: nefks/image-reduction:latest
+    imagePullPolicy: Always

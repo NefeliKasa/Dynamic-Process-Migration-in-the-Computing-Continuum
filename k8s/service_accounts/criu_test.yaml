@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: criu-test 
+  namespace: criu
+---
+apiVersion: rbac.authorization.k8s.io/v1  
+kind: ClusterRole
+metadata:
+  name: criu-test 
+rules:
+  - apiGroups: ["criu.thesis"]
+    resources: ["edgenodes"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: criu-test 
+roleRef: 
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: criu-test 
+subjects:
+  - kind: ServiceAccount
+    name: criu-test
+    namespace: criu
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: criu-test
+  namespace: criu
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: criu-test
+  namespace: criu
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: criu-test
+subjects:
+  - kind: ServiceAccount
+    name: criu-test
+    namespace: criu
