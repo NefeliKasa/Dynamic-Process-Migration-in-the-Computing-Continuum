@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sidecar-controller
+  namespace: criu
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: criu
+  name: sidecar-controller
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "create", "delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sidecar-controller
+  namespace: criu
+subjects:
+  - kind: ServiceAccount
+    name: sidecar-controller
+    namespace: criu
+roleRef:
+  kind: Role
+  name: sidecar-controller
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sidecar-config-reader
+  namespace: nats
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sidecar-config-reader
+  namespace: nats
+subjects:
+  - kind: ServiceAccount
+    name: sidecar-controller
+    namespace: criu
+roleRef:
+  kind: Role
+  name: sidecar-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: checkpoint-cluster
+rules:
+  - apiGroups: [""]
+    resources: ["nodes/checkpoint"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: checkpoint-cluster
+subjects:
+  - kind: ServiceAccount
+    name: sidecar-controller
+    namespace: criu
+roleRef:
+  kind: ClusterRole
+  name: checkpoint-cluster
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: test-case-3
+  namespace: criu
+  labels:
+    app: test-case-3
+spec:
+  template:
+    metadata:
+      labels:
+        app: test-case-3
+    spec:
+      nodeSelector:
+        layer: cloud
+      serviceAccountName: test
+      restartPolicy: Never
+      containers:
+        - name: test-case-3-cont
+          image: nefks/criu_test_case_3:latest
+          imagePullPolicy: Always
+          env:
+            - name: EDGE-NODE-GROUP
+              value: "eks-edge"
+            - name: SETUP_NAMESPACE
+              value: "criu"
+  ttlSecondsAfterFinished: 120
+  backoffLimit: 3

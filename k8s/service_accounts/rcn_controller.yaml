@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rcn-controller
+  namespace: criu
+---
+apiVersion: rbac.authorization.k8s.io/v1 # Cluster role for cluster-scoped custom resource
+kind: ClusterRole
+metadata:
+  name: rcn-controller
+rules:
+  - apiGroups: ["criu.thesis"]
+    resources: ["edgenodes"]
+    verbs: ["list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rcn-controller
+subjects:
+  - kind: ServiceAccount
+    name: rcn-controller
+    namespace: criu
+roleRef:
+  kind: ClusterRole
+  name: rcn-controller
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1 # Namespaced role for regular Kubernetes API operations
+kind: Role
+metadata:
+  name: rcn-controller
+  namespace: criu  
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["create", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rcn-controller
+  namespace: criu  
+subjects:
+  - kind: ServiceAccount
+    name: rcn-controller
+    namespace: criu
+roleRef:
+  kind: Role
+  name: rcn-controller
+  apiGroup: rbac.authorization.k8s.io
